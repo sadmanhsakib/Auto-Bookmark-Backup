@@ -1,8 +1,8 @@
 import os
 import json
-from dotenv import load_dotenv
+import dotenv
 
-load_dotenv(".env")
+dotenv.load_dotenv(".env")
 
 bookmark_path = os.getenv("BOOKMARK_PATH")
 
