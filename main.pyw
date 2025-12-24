@@ -1,24 +1,30 @@
 import os
 import json
 import dotenv
+import datetime
 
 dotenv.load_dotenv(".env")
 
-bookmark_path = os.getenv("BOOKMARK_PATH")
+bookmark_paths = os.getenv("BOOKMARK_PATHS").split(",")
 
 def main():
-    with open(bookmark_path, 'r') as bookmark:
-        # stores the bookmark data into a python dict
-        data = json.load(bookmark)
+    i = 0
 
-    # gets the bookmarks in HTML format with proper indentation
-    bookmark_bar = extract_bookmarks(data["roots"]["bookmark_bar"]["children"])
-    other_bookmarks = extract_bookmarks(data["roots"]["other"]["children"])
+    for path in bookmark_paths:
+        i += 1
 
-    all_bookmarks = bookmark_bar + other_bookmarks
+        with open(path, "r") as bookmark:
+            # stores the bookmark data into a python dict
+            data = json.load(bookmark)
 
-    # exports the HTML file
-    exporting_to_HTML(all_bookmarks)
+        # gets the bookmarks in HTML format with proper indentation
+        bookmark_bar = extract_bookmarks(data["roots"]["bookmark_bar"]["children"])
+        other_bookmarks = extract_bookmarks(data["roots"]["other"]["children"])
+
+        all_bookmarks = bookmark_bar + other_bookmarks
+
+        # exports the HTML file
+        exporting_to_HTML(all_bookmarks, i)
 
 
 # extracts all the bookmarks recursively from the JSON file
@@ -35,21 +41,21 @@ def extract_bookmarks(json_data, indent_level=0):
             folder_name = item["name"]
 
             # Start of a folder
-            html_content += f'{indent}<DT><H3>{folder_name}</H3>\n'
-            html_content += f'{indent}<DL><p>\n'
-            
-            # Recursively process the children of the folder
-            html_content += extract_bookmarks(item['children'], indent_level + 1)
-            
-            # End of the folder
-            html_content += f'{indent}</DL><p>\n'
+            html_content += f"{indent}<DT><H3>{folder_name}</H3>\n"
+            html_content += f"{indent}<DL><p>\n"
 
-    # returns html contents ready to wirte
+            # Recursively process the children of the folder
+            html_content += extract_bookmarks(item["children"], indent_level + 1)
+
+            # End of the folder
+            html_content += f"{indent}</DL><p>\n"
+
+    # returns html contents ready to write
     return html_content
 
 
 # exports a HTML file using the all extracted bookmarks
-def exporting_to_HTML(bookmarks):
+def exporting_to_HTML(bookmarks, i):
     # the initials of the file
     html_headers = """<!DOCTYPE NETSCAPE-Bookmark-file-1>
 <HTML>
@@ -63,9 +69,11 @@ def exporting_to_HTML(bookmarks):
 
     full_html = html_headers + bookmarks + html_footer
 
-    filename = "Brave_bookmark_backup.HTML"
+    filename = (
+        f"bookmark_backup_{i}_{datetime.datetime.now().strftime('%Y-%m-%d')}.html"
+    )
     # force opens a html file
-    with open(filename, 'w', encoding="utf-8") as file:
+    with open(filename, "w", encoding="utf-8") as file:
         file.write(full_html)
 
 
