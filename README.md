@@ -1,3 +1,6 @@
+> **⚠️ ARCHIVED PROJECT**  
+> This project is archived and now part of my [Automation-Toolbox](https://github.com/sadmanhsakib/Automation-Toolbox) repository.
+
 # Auto-Bookmark-Backup
 
 A lightweight Python utility that automatically backs up Chromium-based browser bookmarks (Brave, Chrome, Edge, etc.) to a portable HTML format while preserving the folder hierarchy.
